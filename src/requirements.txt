@@ -5,3 +5,24 @@ torch==2.1.1
 # Those can be necessary in the future
 # torchvision==0.16.1
 # torchaudio==2.1.1
+
+# RAUG dependencies:
+glob2
+numpy
+scipy
+pandas
+matplotlib
+seaborn
+scikit-learn
+pytest-shutil
+tqdm
+opencv-python
+pretrainedmodels
+efficientnet_pytorch
+jupyterlab
+pillow
+tensorboardX
+torchsummary
+python-telegram-bot
+sacred
+imgaug
