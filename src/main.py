@@ -1,3 +1,9 @@
+import os
+import sys
+
+# Including the path to the models folder
+sys.path.insert(0, os.environ["MY_MODELS_PATH"])
+
 import torch
 
 from raug.loader import get_data_loader
