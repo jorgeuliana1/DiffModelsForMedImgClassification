@@ -8,7 +8,7 @@ torch==2.1.1
 
 # RAUG:
 glob2
-numpy==1.26.0
+numpy==1.24.4
 scipy
 pandas
 matplotlib
