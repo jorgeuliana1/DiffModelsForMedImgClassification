@@ -23,25 +23,28 @@ from raug.loader import get_data_loader
 from raug.train import fit_model
 from raug.eval import test_model
 
-from my_model import set_model
-
 from sacred import Experiment
 from sacred.observers import FileStorageObserver
 from raug.utils.loader import get_labels_frequency
 
+from my_model import set_model
+from preprocess import prepare_data
+
+# Preparing data before anything
+prepare_data()
 
 # Starting sacred experiment
 ex = Experiment()
 
 @ex.config
 def cnfg():
-
     # Dataset variables
     _folder = 1
-    _base_path = os.path.join(os.environ["DATASETS_DIR_PATH"], "PAD-UFES-20")
+    _base_path = os.path.join("/app/datasets", "PAD-UFES-20")
+    
     _csv_path_train = os.path.join(_base_path, "pad-ufes-20_parsed_folders.csv")
     _csv_path_test = os.path.join(_base_path, "pad-ufes-20_parsed_test.csv")
-    _imgs_folder_train = os.path.join(_base_path, "imgs")
+    _imgs_folder_train = os.path.join(_base_path, "images")
 
     _use_meta_data = True
     _neurons_reducer_block = 0
@@ -61,7 +64,7 @@ def cnfg():
     _metric_early_stop = None
     _weights = "frequency"
 
-    _model_name = 'resnet-50'
+    _model_name = 'mobilenet'
     _save_folder = "results/" + str(_comb_method) + "_" + _model_name + "_fold_" + str(_folder) + "_" + str(
         time.time()).replace('.', '')
 
