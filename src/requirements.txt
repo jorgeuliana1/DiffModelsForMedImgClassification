@@ -25,5 +25,9 @@ tensorboardX
 torchsummary
 python-telegram-bot
 sacred
-imgaug
+
+# Fixed version of imgaug
+git+https://github.com/marcown/imgaug.git@5eb7adda6aa2ea1628e7e3a7d64d32a3335d38f5
+
+# paaatcha's raug
 git+https://github.com/paaatcha/raug.git
