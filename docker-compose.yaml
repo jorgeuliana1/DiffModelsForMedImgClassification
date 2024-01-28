@@ -10,6 +10,5 @@ services:
               capabilities: [gpu]
     environment:
       - MY_MODELS_PATH=/app/src/my_models
-      - DATASETS_DIR_PATH=${DATASETS_DIR_PATH}
     volumes:
-      - /app/datasets/:${DATASETS_DIR_PATH}:ro
+      - ${DATASETS_DIR_PATH}:/app/datasets/:ro

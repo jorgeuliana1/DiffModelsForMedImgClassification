@@ -19,7 +19,6 @@ COPY ./src /app/src
 
 # Adding environment variables
 ENV MY_MODELS_PATH ${MY_MODELS_PATH}
-ENV DATASETS_DIR_PATH ${DATASETS_DIR_PATH}
 
 # CMD ["python3", "main.py"]
 CMD ["python3", "benchmarks/pad/pad.py"]
