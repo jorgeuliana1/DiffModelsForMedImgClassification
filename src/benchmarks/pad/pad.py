@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Autor: André Pacheco
+Original author: André Pacheco
 Email: pacheco.comp@gmail.com
+
+Modified by: Jorge Uliana
+Email: ulianamjjorge@gmail.com
 
 """
 
@@ -36,6 +39,9 @@ prepare_data()
 # Starting sacred experiment
 ex = Experiment()
 
+# PARAMAS: TODO: Use and YAML config file to pass these params
+DATALOADER_NUM_WORKERS = 4 # Originally 16
+
 @ex.config
 def cnfg():
     # Dataset variables
@@ -46,7 +52,7 @@ def cnfg():
     _csv_path_test = os.path.join(_base_path, "pad-ufes-20_parsed_test.csv")
     _imgs_folder_train = os.path.join(_base_path, "images")
 
-    _use_meta_data = True
+    _use_meta_data = False
     _neurons_reducer_block = 0
     _comb_method = None # metanet, concat, or metablock
     _comb_config = None # number of metadata
@@ -124,7 +130,7 @@ def main (_folder, _csv_path_train, _imgs_folder_train, _lr_init, _sched_factor,
         print("-- No metadata")
         val_meta_data = None
     val_data_loader = get_data_loader (val_imgs_path, val_labels, val_meta_data, transform=ImgEvalTransform(),
-                                       batch_size=_batch_size, shuf=True, num_workers=16, pin_memory=True)
+                                       batch_size=_batch_size, shuf=True, num_workers=DATALOADER_NUM_WORKERS, pin_memory=True)
     print("-- Validation partition loaded with {} images".format(len(val_data_loader)*_batch_size))
 
     print("- Loading training data...")
@@ -138,7 +144,7 @@ def main (_folder, _csv_path_train, _imgs_folder_train, _lr_init, _sched_factor,
         print("-- No metadata")
         train_meta_data = None
     train_data_loader = get_data_loader (train_imgs_path, train_labels, train_meta_data, transform=ImgTrainTransform(),
-                                       batch_size=_batch_size, shuf=True, num_workers=16, pin_memory=True)
+                                       batch_size=_batch_size, shuf=True, num_workers=DATALOADER_NUM_WORKERS, pin_memory=True)
     print("-- Training partition loaded with {} images".format(len(train_data_loader)*_batch_size))
 
     print("-"*50)
@@ -197,7 +203,7 @@ def main (_folder, _csv_path_train, _imgs_folder_train, _lr_init, _sched_factor,
         'pred_name_scores': 'predictions.csv',
         'normalize_conf_matrix': True}
     test_data_loader = get_data_loader(test_imgs_path, test_labels, test_meta_data, transform=ImgEvalTransform(),
-                                       batch_size=_batch_size, shuf=False, num_workers=16, pin_memory=True)
+                                       batch_size=_batch_size, shuf=False, num_workers=DATALOADER_NUM_WORKERS, pin_memory=True)
     print("-" * 50)
     # Testing the test partition
     print("\n- Evaluating the validation partition...")
