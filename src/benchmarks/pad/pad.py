@@ -71,8 +71,8 @@ def cnfg():
     _weights = "frequency"
 
     _model_name = 'mobilenet'
-    _save_folder = "results/" + str(_comb_method) + "_" + _model_name + "_fold_" + str(_folder) + "_" + str(
-        time.time()).replace('.', '')
+    _save_dir = f"{_comb_method}_{_model_name}_fold_{_folder}_{str(time.time()).replace('.', '')}"
+    _save_folder = os.path.join("/app", "results", _save_dir)
 
     # This is used to configure the sacred storage observer. In brief, it says to sacred to save its stuffs in
     # _save_folder. You don't need to worry about that.

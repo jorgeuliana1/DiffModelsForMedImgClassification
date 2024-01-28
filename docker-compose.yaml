@@ -12,3 +12,4 @@ services:
       - MY_MODELS_PATH=/app/src/my_models
     volumes:
       - ${DATASETS_DIR_PATH}:/app/datasets/:rw
+      - ${RESULTS_DIR_PATH}:/app/results/:rw
