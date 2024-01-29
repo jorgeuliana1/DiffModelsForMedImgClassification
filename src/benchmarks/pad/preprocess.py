@@ -30,7 +30,13 @@ def prepare_data():
 
     # Treating columns in order to make it more adequate for NN training/validation
     # untreated_columns refers to the columns which don't require any sort of treatment
-    untreated_columns = {"img_id", "diagnostic", "patient_id", "lesion_id", "biopsed"}
+    untreated_columns = {
+        "img_id",
+        "diagnostic",
+        "patient_id",
+        "lesion_id",
+        "biopsed",
+    }
     dataset_columns = set(raw_data_csv.columns)
     pretreated_columns = list(dataset_columns - untreated_columns)
     treated_columns = ["age", "diameter_1", "diameter_2"]

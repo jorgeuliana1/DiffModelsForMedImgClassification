@@ -114,7 +114,7 @@ class MyMobilenet(nn.Module):
         x = self.features(img)
         x = x.mean([2, 3])
 
-        if self.comb == None:
+        if self.comb is None:
             x = x.view(x.size(0), -1)  # flatting
             if self.reducer_block is not None:
                 x = self.reducer_block(x)  # feat reducer block

@@ -10,21 +10,14 @@ Email: ulianamjjorge@gmail.com
 
 import os
 import sys
-
-import yaml
-
-# Including the path to the models folder
-sys.path.insert(0, os.environ["MY_MODELS_PATH"])
-
-import os
 import time
 
 import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import yaml
 from aug_pad import ImgEvalTransform, ImgTrainTransform
-from my_model import set_model
 from preprocess import prepare_data
 from raug.eval import test_model
 from raug.loader import get_data_loader
@@ -32,6 +25,10 @@ from raug.train import fit_model
 from raug.utils.loader import get_labels_frequency
 from sacred import Experiment
 from sacred.observers import FileStorageObserver
+
+# Including the path to the models folder
+sys.path.insert(0, os.environ["MY_MODELS_PATH"])
+from my_model import set_model  # noqa
 
 # Preparing data before anything
 prepare_data()
@@ -46,9 +43,9 @@ def cnfg():
     _folder = 1
     _base_path = os.path.join("/app/datasets", "PAD-UFES-20")
 
-    _csv_path_train = os.path.join(_base_path, "pad-ufes-20_parsed_folders.csv")
-    _csv_path_test = os.path.join(_base_path, "pad-ufes-20_parsed_test.csv")
-    _imgs_folder_train = os.path.join(_base_path, "images")
+    _csv_path_train = os.path.join(_base_path, "pad-ufes-20_parsed_folders.csv")  # noqa
+    _csv_path_test = os.path.join(_base_path, "pad-ufes-20_parsed_test.csv")  # noqa
+    _imgs_folder_train = os.path.join(_base_path, "images")  # noqa
 
     # Loading configs from yaml
     with open("/app/src/config.yaml", "r") as yaml_f:
@@ -56,28 +53,28 @@ def cnfg():
 
     # Dataset variables
     dataset_cfg = cfgs["dataset"]
-    _use_meta_data = dataset_cfg["use_meta_data"]
-    _neurons_reducer_block = dataset_cfg["neurons_reducer_block"]
-    _comb_method = dataset_cfg["comb_method"]
-    _comb_config = dataset_cfg["comb_config"]
+    _use_meta_data = dataset_cfg["use_meta_data"]  # noqa
+    _neurons_reducer_block = dataset_cfg["neurons_reducer_block"]  # noqa
+    _comb_method = dataset_cfg["comb_method"]  # noqa
+    _comb_config = dataset_cfg["comb_config"]  # noqa
 
     # Training variables
     training_cfg = cfgs["training"]
-    _batch_size = training_cfg["batch_size"]
-    _epochs = training_cfg["epochs"]
-    _best_metric = training_cfg["best_metric"]
-    _pretrained = training_cfg["pretrained"]
-    _lr_init = training_cfg["lr_init"]
-    _sched_factor = training_cfg["sched_factor"]
-    _sched_min_lr = training_cfg["sched_min_lr"]
-    _sched_patience = training_cfg["sched_patience"]
-    _early_stop = training_cfg["early_stop"]
-    _metric_early_stop = training_cfg["metric_early_stop"]
-    _weights = training_cfg["weights"]
+    _batch_size = training_cfg["batch_size"]  # noqa
+    _epochs = training_cfg["epochs"]  # noqa
+    _best_metric = training_cfg["best_metric"]  # noqa
+    _pretrained = training_cfg["pretrained"]  # noqa
+    _lr_init = training_cfg["lr_init"]  # noqa
+    _sched_factor = training_cfg["sched_factor"]  # noqa
+    _sched_min_lr = training_cfg["sched_min_lr"]  # noqa
+    _sched_patience = training_cfg["sched_patience"]  # noqa
+    _early_stop = training_cfg["early_stop"]  # noqa
+    _metric_early_stop = training_cfg["metric_early_stop"]  # noqa
+    _weights = training_cfg["weights"]  # noqa
 
     # DataLoader variables
     dataloader_cfg = cfgs["dataloader"]
-    _num_workers = dataloader_cfg["num_workers"]
+    _num_workers = dataloader_cfg["num_workers"]  # noqa
 
     _model_name = "mobilenet"
     _save_dir = f"{_comb_method}_{_model_name}_fold_{_folder}_{str(time.time()).replace('.', '')}"
@@ -271,13 +268,13 @@ def main(
     )
 
     print("-" * 50)
-    ####################################################################################################################
+    ###############################################################################################################
 
     ser_lab_freq = get_labels_frequency(train_csv_folder, "diagnostic", "img_id")
     _labels_name = ser_lab_freq.index.values
     _freq = ser_lab_freq.values
     print(ser_lab_freq)
-    ####################################################################################################################
+    ###############################################################################################################
     print("- Loading", _model_name)
 
     model = set_model(
@@ -288,7 +285,7 @@ def main(
         comb_config=_comb_config,
         pretrained=_pretrained,
     )
-    ####################################################################################################################
+    ###############################################################################################################
     if _weights == "frequency":
         _weights = (_freq.sum() / _freq).round(3)
 
@@ -297,9 +294,12 @@ def main(
         model.parameters(), lr=_lr_init, momentum=0.9, weight_decay=0.001
     )
     scheduler_lr = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, factor=_sched_factor, min_lr=_sched_min_lr, patience=_sched_patience
+        optimizer,
+        factor=_sched_factor,
+        min_lr=_sched_min_lr,
+        patience=_sched_patience,
     )
-    ####################################################################################################################
+    ###############################################################################################################
 
     print("- Starting the training phase...")
     print("-" * 50)
@@ -323,7 +323,7 @@ def main(
         val_metrics=["balanced_accuracy"],
         best_metric=_best_metric,
     )
-    ####################################################################################################################
+    ################################################################################################################
 
     # Testing the validation partition
     print("- Evaluating the validation partition...")
@@ -340,9 +340,9 @@ def main(
         apply_softmax=True,
         verbose=False,
     )
-    ####################################################################################################################
+    ################################################################################################################
 
-    ####################################################################################################################
+    ################################################################################################################
 
     print("- Loading test data...")
     csv_test = pd.read_csv(_csv_path_test)
@@ -386,4 +386,4 @@ def main(
         save_pred=True,
         verbose=False,
     )
-    ####################################################################################################################
+    ###############################################################################################################

@@ -45,9 +45,7 @@ class ImgTrainTransform:
                     iaa.OneOf(
                         [
                             iaa.Add((-15, 15), per_channel=0.5),  # brightness
-                            iaa.AddToHueAndSaturation(
-                                value=(-10, 10), per_channel=True
-                            ),
+                            iaa.AddToHueAndSaturation(value=(-10, 10), per_channel=True),
                         ]
                     ),
                 ),
