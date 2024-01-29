@@ -10,13 +10,15 @@ This file implements the Context Guider Cell (GCell)
 If you find any bug or have some suggestion, please, email me.
 """
 
-import torch.nn as nn
 import torch
+import torch.nn as nn
+
 
 class MetaBlock(nn.Module):
     """
     Implementing the Metadata Processing Block (MetaBlock)
     """
+
     def __init__(self, V, U):
         super(MetaBlock, self).__init__()
         self.fb = nn.Sequential(nn.Linear(U, V), nn.BatchNorm1d(V))

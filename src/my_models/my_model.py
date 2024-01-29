@@ -12,16 +12,32 @@ from mobilenet import MyMobilenet
 # from resnet import MyResnet
 # from vggnet import MyVGGNet
 from torchvision import models
+
 # from efficientnet_pytorch import EfficientNet
 
-_MODELS = ['resnet-50', 'resnet-101', 'densenet-121', 'vgg-13', 'vgg-16', 'vgg-19',
-           'mobilenet', 'efficientnet-b4']
+_MODELS = [
+    "resnet-50",
+    "resnet-101",
+    "densenet-121",
+    "vgg-13",
+    "vgg-16",
+    "vgg-19",
+    "mobilenet",
+    "efficientnet-b4",
+]
 
 _NORM_AND_SIZE = [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225], [224, 224]]
 
 
-def set_model (model_name, num_class, neurons_reducer_block=0, comb_method=None, comb_config=None, pretrained=True,
-         freeze_conv=False):
+def set_model(
+    model_name,
+    num_class,
+    neurons_reducer_block=0,
+    comb_method=None,
+    comb_config=None,
+    pretrained=True,
+    freeze_conv=False,
+):
 
     if pretrained:
         pre_torch = True
@@ -57,9 +73,15 @@ def set_model (model_name, num_class, neurons_reducer_block=0, comb_method=None,
     #                      comb_method=comb_method, comb_config=comb_config)
 
     # elif model_name == 'mobilenet':
-    if model_name == 'mobilenet':
-        model = MyMobilenet(models.mobilenet_v2(pretrained=pre_torch), num_class, neurons_reducer_block, freeze_conv,
-                         comb_method=comb_method, comb_config=comb_config)
+    if model_name == "mobilenet":
+        model = MyMobilenet(
+            models.mobilenet_v2(pretrained=pre_torch),
+            num_class,
+            neurons_reducer_block,
+            freeze_conv,
+            comb_method=comb_method,
+            comb_config=comb_config,
+        )
 
     # elif model_name == 'efficientnet-b4':
     #     if pretrained:
