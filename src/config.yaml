@@ -1,0 +1,21 @@
+dataset:
+  use_meta_data: false
+  neurons_reducer_block: 0
+  comb_method: null # metanet, concat, or metablock
+  comb_config: null # number of metadata
+
+training:
+  batch_size: 30
+  epochs: 150
+  best_metric: loss
+  pretrained: true
+  lr_init: 0.001
+  sched_factor: 0.1
+  sched_min_lr: 0.000001
+  sched_patience: 10
+  early_stop: 15
+  metric_early_stop: null
+  weights: frequency
+
+dataloader:
+  num_workers: 4 # originally 16

@@ -10,6 +10,7 @@ Email: ulianamjjorge@gmail.com
 
 import os
 import sys
+import yaml
 
 # Including the path to the models folder
 sys.path.insert(0, os.environ["MY_MODELS_PATH"])
@@ -39,9 +40,6 @@ prepare_data()
 # Starting sacred experiment
 ex = Experiment()
 
-# PARAMAS: TODO: Use and YAML config file to pass these params
-DATALOADER_NUM_WORKERS = 4 # Originally 16
-
 @ex.config
 def cnfg():
     # Dataset variables
@@ -51,24 +49,35 @@ def cnfg():
     _csv_path_train = os.path.join(_base_path, "pad-ufes-20_parsed_folders.csv")
     _csv_path_test = os.path.join(_base_path, "pad-ufes-20_parsed_test.csv")
     _imgs_folder_train = os.path.join(_base_path, "images")
+    
+    # Loading configs from yaml
+    with open("/app/src/config.yaml", "r") as yaml_f:
+        cfgs = yaml.safe_load(yaml_f)
 
-    _use_meta_data = False
-    _neurons_reducer_block = 0
-    _comb_method = None # metanet, concat, or metablock
-    _comb_config = None # number of metadata
-    _batch_size = 30
-    _epochs = 150
+    # Dataset variables
+    dataset_cfg = cfgs["dataset"]
+    _use_meta_data = dataset_cfg["use_meta_data"]
+    _neurons_reducer_block = dataset_cfg["neurons_reducer_block"]
+    _comb_method = dataset_cfg["comb_method"]
+    _comb_config = dataset_cfg["comb_config"]
 
     # Training variables
-    _best_metric = "loss"
-    _pretrained = True
-    _lr_init = 0.001
-    _sched_factor = 0.1
-    _sched_min_lr = 1e-6
-    _sched_patience = 10
-    _early_stop = 15
-    _metric_early_stop = None
-    _weights = "frequency"
+    training_cfg = cfgs["training"]
+    _batch_size = training_cfg["batch_size"]
+    _epochs = training_cfg["epochs"]
+    _best_metric = training_cfg["best_metric"]
+    _pretrained = training_cfg["pretrained"]
+    _lr_init = training_cfg["lr_init"]
+    _sched_factor = training_cfg["sched_factor"]
+    _sched_min_lr = training_cfg["sched_min_lr"]
+    _sched_patience = training_cfg["sched_patience"]
+    _early_stop = training_cfg["early_stop"]
+    _metric_early_stop = training_cfg["metric_early_stop"]
+    _weights = training_cfg["weights"]
+    
+    # DataLoader variables
+    dataloader_cfg = cfgs["dataloader"]
+    _num_workers = dataloader_cfg["num_workers"]
 
     _model_name = 'mobilenet'
     _save_dir = f"{_comb_method}_{_model_name}_fold_{_folder}_{str(time.time()).replace('.', '')}"
@@ -82,7 +91,8 @@ def cnfg():
 @ex.automain
 def main (_folder, _csv_path_train, _imgs_folder_train, _lr_init, _sched_factor, _sched_min_lr, _sched_patience,
           _batch_size, _epochs, _early_stop, _weights, _model_name, _pretrained, _save_folder, _csv_path_test,
-          _best_metric, _neurons_reducer_block, _comb_method, _comb_config, _use_meta_data, _metric_early_stop):
+          _best_metric, _neurons_reducer_block, _comb_method, _comb_config, _use_meta_data, _metric_early_stop,
+          _num_workers):
 
     meta_data_columns = ["smoke_False", "smoke_True", "drink_False", "drink_True", "background_father_POMERANIA",
                          "background_father_GERMANY", "background_father_BRAZIL", "background_father_NETHERLANDS",
@@ -130,7 +140,7 @@ def main (_folder, _csv_path_train, _imgs_folder_train, _lr_init, _sched_factor,
         print("-- No metadata")
         val_meta_data = None
     val_data_loader = get_data_loader (val_imgs_path, val_labels, val_meta_data, transform=ImgEvalTransform(),
-                                       batch_size=_batch_size, shuf=True, num_workers=DATALOADER_NUM_WORKERS, pin_memory=True)
+                                       batch_size=_batch_size, shuf=True, num_workers=_num_workers, pin_memory=True)
     print("-- Validation partition loaded with {} images".format(len(val_data_loader)*_batch_size))
 
     print("- Loading training data...")
@@ -144,7 +154,7 @@ def main (_folder, _csv_path_train, _imgs_folder_train, _lr_init, _sched_factor,
         print("-- No metadata")
         train_meta_data = None
     train_data_loader = get_data_loader (train_imgs_path, train_labels, train_meta_data, transform=ImgTrainTransform(),
-                                       batch_size=_batch_size, shuf=True, num_workers=DATALOADER_NUM_WORKERS, pin_memory=True)
+                                       batch_size=_batch_size, shuf=True, num_workers=_num_workers, pin_memory=True)
     print("-- Training partition loaded with {} images".format(len(train_data_loader)*_batch_size))
 
     print("-"*50)
@@ -203,7 +213,7 @@ def main (_folder, _csv_path_train, _imgs_folder_train, _lr_init, _sched_factor,
         'pred_name_scores': 'predictions.csv',
         'normalize_conf_matrix': True}
     test_data_loader = get_data_loader(test_imgs_path, test_labels, test_meta_data, transform=ImgEvalTransform(),
-                                       batch_size=_batch_size, shuf=False, num_workers=DATALOADER_NUM_WORKERS, pin_memory=True)
+                                       batch_size=_batch_size, shuf=False, num_workers=_num_workers, pin_memory=True)
     print("-" * 50)
     # Testing the test partition
     print("\n- Evaluating the validation partition...")
