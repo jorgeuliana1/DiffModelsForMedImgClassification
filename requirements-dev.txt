@@ -1,0 +1,35 @@
+--find-links https://download.pytorch.org/whl/cu121
+
+torch==2.1.1
+
+# Those can be necessary in the future
+# torchvision==0.16.1
+# torchaudio==2.1.1
+
+# RAUG:
+glob2
+numpy==1.24.4
+scipy
+pandas
+matplotlib
+seaborn
+scikit-learn
+pytest-shutil
+tqdm
+opencv-python
+pretrainedmodels
+efficientnet_pytorch
+jupyterlab
+pillow
+tensorboardX
+torchsummary
+python-telegram-bot
+sacred
+
+# Fixed version of imgaug
+git+https://github.com/marcown/imgaug.git@5eb7adda6aa2ea1628e7e3a7d64d32a3335d38f5
+
+# paaatcha's raug
+git+https://github.com/paaatcha/raug.git
+
+pre-commit==3.6.0
