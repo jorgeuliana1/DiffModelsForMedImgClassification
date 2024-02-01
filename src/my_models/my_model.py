@@ -6,6 +6,8 @@ Email: pacheco.comp@gmail.com
 Function to load the CNN models
 """
 
+import timm
+
 # from effnet import MyEffnet
 # from densenet import MyDensenet
 from mobilenet import MyMobilenet
@@ -16,7 +18,6 @@ from torchvision import models
 
 # from efficientnet_pytorch import EfficientNet
 
-import timm
 
 _MODELS = [
     "resnet-50",
@@ -31,22 +32,39 @@ _MODELS = [
 
 _NORM_AND_SIZE = [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225], [224, 224]]
 
+
 def get_norm_and_size(model_name):
     if model_name == "inceptionv4":
         return [229, 229], ([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     elif model_name in ["beit", "vit"]:
         return [224, 224], ([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
-    elif model_name in ['resnet-50', 'resnet-101', 'densenet-121', 'googlenet', 'vgg-13', 'vgg-16', 'vgg-19',
-                        'mobilenet', 'efficientnet-b4', 'senet', 'vit', 'deit']:
+    elif model_name in [
+        "resnet-50",
+        "resnet-101",
+        "densenet-121",
+        "googlenet",
+        "vgg-13",
+        "vgg-16",
+        "vgg-19",
+        "mobilenet",
+        "efficientnet-b4",
+        "senet",
+        "vit",
+        "deit",
+    ]:
         return [224, 224], ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     else:
         # Load pre defined parameters for timm models
         pre_load_model = timm.create_model(model_name, pretrained=True, num_classes=0)
         size = list(pre_load_model.default_cfg["input_size"][1:])
-        mean_std = (list(pre_load_model.default_cfg["mean"]), list(pre_load_model.default_cfg["std"]))
+        mean_std = (
+            list(pre_load_model.default_cfg["mean"]),
+            list(pre_load_model.default_cfg["std"]),
+        )
         del pre_load_model
         return size, mean_std
         # return [384, 384], ([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+
 
 def set_model(
     model_name,
