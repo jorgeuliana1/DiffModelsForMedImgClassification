@@ -5,6 +5,7 @@ dataset:
   comb_config: null # number of metadata
 
 training:
+  keep_lr_prop: true
   batch_size: 30
   epochs: 150
   best_metric: loss
@@ -19,3 +20,6 @@ training:
 
 dataloader:
   num_workers: 4 # originally 16
+
+ndb:
+  task: TaskII

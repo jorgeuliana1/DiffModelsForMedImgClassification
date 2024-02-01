@@ -21,4 +21,5 @@ COPY ./src /app/src
 ENV MY_MODELS_PATH ${MY_MODELS_PATH}
 
 # CMD ["python3", "main.py"]
-CMD ["python3", "benchmarks/pad/pad.py"]
+# CMD ["python3", "benchmarks/pad/pad.py"]
+CMD ["python3", "benchmarks/ndb/ndb.py"]
