@@ -8,6 +8,7 @@ Email: ulianamjjorge@gmail.com
 
 """
 
+import logging
 import os
 import sys
 import time
@@ -30,15 +31,18 @@ from sacred.observers import FileStorageObserver
 sys.path.insert(0, os.environ["MY_MODELS_PATH"])
 from my_model import set_model  # noqa
 
-# Preparing data before anything
-prepare_data()
-
 # Starting sacred experiment
 ex = Experiment()
 
 
 @ex.config
 def cnfg():
+    # Preparing data before anything
+    prepare_data()
+
+    # Setting up logger
+    _logger = logging.Logger("PAD-UFES-20")  # noqa
+
     # Dataset variables
     _folder = 1
     _base_path = os.path.join("/app/datasets", "PAD-UFES-20")
@@ -88,6 +92,7 @@ def cnfg():
 
 @ex.automain
 def main(
+    _logger,
     _folder,
     _csv_path_train,
     _imgs_folder_train,
@@ -206,22 +211,19 @@ def main(
     # Loading the csv file
     csv_all_folders = pd.read_csv(_csv_path_train)
 
-    print("-" * 50)
-    print("- Loading validation data...")
+    _logger.info("- Loading validation data...")
     val_csv_folder = csv_all_folders[(csv_all_folders["folder"] == _folder)]
     train_csv_folder = csv_all_folders[csv_all_folders["folder"] != _folder]
 
     # Loading validation data
     val_imgs_id = val_csv_folder["img_id"].values
-    val_imgs_path = [
-        "{}/{}".format(_imgs_folder_train, img_id) for img_id in val_imgs_id
-    ]
+    val_imgs_path = [f"{_imgs_folder_train}/{img_id}" for img_id in val_imgs_id]
     val_labels = val_csv_folder["diagnostic_number"].values
     if _use_meta_data:
         val_meta_data = val_csv_folder[meta_data_columns].values
-        print("-- Using {} meta-data features".format(len(meta_data_columns)))
+        _logger.info(f"-- Using {len(meta_data_columns)} meta-data features")
     else:
-        print("-- No metadata")
+        _logger.info("-- No metadata")
         val_meta_data = None
     val_data_loader = get_data_loader(
         val_imgs_path,
@@ -233,23 +235,19 @@ def main(
         num_workers=_num_workers,
         pin_memory=True,
     )
-    print(
-        "-- Validation partition loaded with {} images".format(
-            len(val_data_loader) * _batch_size
-        )
+    _logger.info(
+        f"-- Validation partition loaded with {len(val_data_loader) * _batch_size} images"
     )
 
-    print("- Loading training data...")
+    _logger.info("- Loading training data...")
     train_imgs_id = train_csv_folder["img_id"].values
-    train_imgs_path = [
-        "{}/{}".format(_imgs_folder_train, img_id) for img_id in train_imgs_id
-    ]
+    train_imgs_path = ["{_imgs_folder_train}/{img_id}" for img_id in train_imgs_id]
     train_labels = train_csv_folder["diagnostic_number"].values
     if _use_meta_data:
         train_meta_data = train_csv_folder[meta_data_columns].values
-        print("-- Using {} meta-data features".format(len(meta_data_columns)))
+        _logger.info(f"-- Using {len(meta_data_columns)} meta-data features")
     else:
-        print("-- No metadata")
+        _logger.info("-- No metadata")
         train_meta_data = None
     train_data_loader = get_data_loader(
         train_imgs_path,
@@ -261,21 +259,15 @@ def main(
         num_workers=_num_workers,
         pin_memory=True,
     )
-    print(
-        "-- Training partition loaded with {} images".format(
-            len(train_data_loader) * _batch_size
-        )
+    _logger.info(
+        f"-- Training partition loaded with {len(train_data_loader) * _batch_size} images"
     )
-
-    print("-" * 50)
-    ###############################################################################################################
 
     ser_lab_freq = get_labels_frequency(train_csv_folder, "diagnostic", "img_id")
     _labels_name = ser_lab_freq.index.values
     _freq = ser_lab_freq.values
-    print(ser_lab_freq)
-    ###############################################################################################################
-    print("- Loading", _model_name)
+
+    _logger.info(f"- Loading {_model_name}")
 
     model = set_model(
         _model_name,
@@ -285,7 +277,7 @@ def main(
         comb_config=_comb_config,
         pretrained=_pretrained,
     )
-    ###############################################################################################################
+
     if _weights == "frequency":
         _weights = (_freq.sum() / _freq).round(3)
 
@@ -299,10 +291,8 @@ def main(
         min_lr=_sched_min_lr,
         patience=_sched_patience,
     )
-    ###############################################################################################################
 
-    print("- Starting the training phase...")
-    print("-" * 50)
+    _logger.info("- Starting the training phase...")
     fit_model(
         model,
         train_data_loader,
@@ -323,10 +313,8 @@ def main(
         val_metrics=["balanced_accuracy"],
         best_metric=_best_metric,
     )
-    ################################################################################################################
-
     # Testing the validation partition
-    print("- Evaluating the validation partition...")
+    _logger.info("- Evaluating the validation partition...")
     test_model(
         model,
         val_data_loader,
@@ -340,23 +328,18 @@ def main(
         apply_softmax=True,
         verbose=False,
     )
-    ################################################################################################################
 
-    ################################################################################################################
-
-    print("- Loading test data...")
+    _logger.info("- Loading test data...")
     csv_test = pd.read_csv(_csv_path_test)
     test_imgs_id = csv_test["img_id"].values
-    test_imgs_path = [
-        "{}/{}".format(_imgs_folder_train, img_id) for img_id in test_imgs_id
-    ]
+    test_imgs_path = [f"{_imgs_folder_train}/{img_id}" for img_id in test_imgs_id]
     test_labels = csv_test["diagnostic_number"].values
     if _use_meta_data:
         test_meta_data = csv_test[meta_data_columns].values
-        print("-- Using {} meta-data features".format(len(meta_data_columns)))
+        _logger.info(f"-- Using {len(meta_data_columns)} meta-data features")
     else:
         test_meta_data = None
-        print("-- No metadata")
+        _logger.info("-- No metadata")
 
     _metric_options = {
         "save_all_path": os.path.join(_save_folder, "test_pred"),
@@ -373,9 +356,9 @@ def main(
         num_workers=_num_workers,
         pin_memory=True,
     )
-    print("-" * 50)
+
     # Testing the test partition
-    print("\n- Evaluating the validation partition...")
+    _logger.info("\n- Evaluating the validation partition...")
     test_model(
         model,
         test_data_loader,
@@ -386,4 +369,3 @@ def main(
         save_pred=True,
         verbose=False,
     )
-    ###############################################################################################################
