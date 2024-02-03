@@ -40,9 +40,6 @@ def cnfg():
     # Preparing data before anything
     prepare_data()
 
-    # Setting up logger
-    _logger = logging.Logger("PAD-UFES-20")  # noqa
-
     # Dataset variables
     _folder = 1
     _base_path = os.path.join("/app/datasets", "PAD-UFES-20")
@@ -92,7 +89,6 @@ def cnfg():
 
 @ex.automain
 def main(
-    _logger,
     _folder,
     _csv_path_train,
     _imgs_folder_train,
@@ -211,7 +207,7 @@ def main(
     # Loading the csv file
     csv_all_folders = pd.read_csv(_csv_path_train)
 
-    _logger.info("- Loading validation data...")
+    print("- Loading validation data...")
     val_csv_folder = csv_all_folders[(csv_all_folders["folder"] == _folder)]
     train_csv_folder = csv_all_folders[csv_all_folders["folder"] != _folder]
 
@@ -221,9 +217,9 @@ def main(
     val_labels = val_csv_folder["diagnostic_number"].values
     if _use_meta_data:
         val_meta_data = val_csv_folder[meta_data_columns].values
-        _logger.info(f"-- Using {len(meta_data_columns)} meta-data features")
+        print(f"-- Using {len(meta_data_columns)} meta-data features")
     else:
-        _logger.info("-- No metadata")
+        print("-- No metadata")
         val_meta_data = None
     val_data_loader = get_data_loader(
         val_imgs_path,
@@ -235,19 +231,19 @@ def main(
         num_workers=_num_workers,
         pin_memory=True,
     )
-    _logger.info(
+    print(
         f"-- Validation partition loaded with {len(val_data_loader) * _batch_size} images"
     )
 
-    _logger.info("- Loading training data...")
+    print("- Loading training data...")
     train_imgs_id = train_csv_folder["img_id"].values
     train_imgs_path = ["{_imgs_folder_train}/{img_id}" for img_id in train_imgs_id]
     train_labels = train_csv_folder["diagnostic_number"].values
     if _use_meta_data:
         train_meta_data = train_csv_folder[meta_data_columns].values
-        _logger.info(f"-- Using {len(meta_data_columns)} meta-data features")
+        print(f"-- Using {len(meta_data_columns)} meta-data features")
     else:
-        _logger.info("-- No metadata")
+        print("-- No metadata")
         train_meta_data = None
     train_data_loader = get_data_loader(
         train_imgs_path,
@@ -259,7 +255,7 @@ def main(
         num_workers=_num_workers,
         pin_memory=True,
     )
-    _logger.info(
+    print(
         f"-- Training partition loaded with {len(train_data_loader) * _batch_size} images"
     )
 
@@ -267,7 +263,7 @@ def main(
     _labels_name = ser_lab_freq.index.values
     _freq = ser_lab_freq.values
 
-    _logger.info(f"- Loading {_model_name}")
+    print(f"- Loading {_model_name}")
 
     model = set_model(
         _model_name,
@@ -292,7 +288,7 @@ def main(
         patience=_sched_patience,
     )
 
-    _logger.info("- Starting the training phase...")
+    print("- Starting the training phase...")
     fit_model(
         model,
         train_data_loader,
@@ -314,7 +310,7 @@ def main(
         best_metric=_best_metric,
     )
     # Testing the validation partition
-    _logger.info("- Evaluating the validation partition...")
+    print("- Evaluating the validation partition...")
     test_model(
         model,
         val_data_loader,
@@ -329,17 +325,17 @@ def main(
         verbose=False,
     )
 
-    _logger.info("- Loading test data...")
+    print("- Loading test data...")
     csv_test = pd.read_csv(_csv_path_test)
     test_imgs_id = csv_test["img_id"].values
     test_imgs_path = [f"{_imgs_folder_train}/{img_id}" for img_id in test_imgs_id]
     test_labels = csv_test["diagnostic_number"].values
     if _use_meta_data:
         test_meta_data = csv_test[meta_data_columns].values
-        _logger.info(f"-- Using {len(meta_data_columns)} meta-data features")
+        print(f"-- Using {len(meta_data_columns)} meta-data features")
     else:
         test_meta_data = None
-        _logger.info("-- No metadata")
+        print("-- No metadata")
 
     _metric_options = {
         "save_all_path": os.path.join(_save_folder, "test_pred"),
@@ -358,7 +354,7 @@ def main(
     )
 
     # Testing the test partition
-    _logger.info("\n- Evaluating the validation partition...")
+    print("\n- Evaluating the validation partition...")
     test_model(
         model,
         test_data_loader,
