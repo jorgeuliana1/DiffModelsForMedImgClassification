@@ -29,15 +29,14 @@ from sacred.observers import FileStorageObserver
 sys.path.insert(0, os.environ["MY_MODELS_PATH"])
 from my_model import get_norm_and_size, set_model  # noqa
 
-# Preparing data before anything
-prepare_data()
-
 # Starting sacred experiment
 ex = Experiment()
 
-
 @ex.config
 def cnfg():
+    # Preparing data before anything
+    prepare_data()
+    
     # Loading tasks infos from json
     with open("/app/src/benchmarks/ndb/tasks.json", "r") as json_f:
         tasks = json.load(json_f)  # noqa
@@ -145,7 +144,6 @@ def main(
     # Loading the csv file
     csv_all_folders = pd.read_csv(csv_path_train)
 
-    print("-" * 50)
     print("- Loading validation data...")
     if "synthetic" in csv_all_folders.columns:
         synthetics = csv_all_folders["synthetic"]
@@ -212,14 +210,10 @@ def main(
         )
     )
 
-    print("-" * 50)
-    ####################################################################################################################
-
     ser_lab_freq = get_labels_frequency(train_csv_folder, label_name, img_path_col)
     labels_name = ser_lab_freq.index.values
     freq = ser_lab_freq.values
-    print(ser_lab_freq)
-    ####################################################################################################################
+    
     print("- Loading", model_name)
 
     model = set_model(
@@ -230,7 +224,7 @@ def main(
         comb_config=comb_config,
         pretrained=pretrained,
     )
-    ####################################################################################################################
+  
     if weights == "frequency":
         weights = (freq.sum() / freq).round(3)
 
@@ -242,7 +236,6 @@ def main(
     scheduler_lr = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, factor=sched_factor, min_lr=sched_min_lr, patience=sched_patience
     )
-    ####################################################################################################################
 
     print("- Starting the training phase...")
     print("-" * 50)
@@ -266,7 +259,6 @@ def main(
         val_metrics=["balanced_accuracy"],
         best_metric=best_metric,
     )
-    ####################################################################################################################
 
     # Testing the validation partition
     print("- Evaluating the validation partition...")
@@ -283,9 +275,6 @@ def main(
         apply_softmax=True,
         verbose=False,
     )
-    ####################################################################################################################
-
-    ####################################################################################################################
 
     print("- Loading test data...")
     csv_test = pd.read_csv(csv_path_test)
@@ -317,7 +306,7 @@ def main(
         num_workers=2,
         pin_memory=True,
     )
-    print("-" * 50)
+    
     # Testing the test partition
     print("\n- Evaluating the validation partition...")
     test_model(
@@ -330,4 +319,3 @@ def main(
         save_pred=True,
         verbose=False,
     )
-    ####################################################################################################################
