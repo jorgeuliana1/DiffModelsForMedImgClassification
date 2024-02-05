@@ -20,6 +20,5 @@ COPY ./src /app/src
 # Adding environment variables
 ENV MY_MODELS_PATH ${MY_MODELS_PATH}
 
-# CMD ["python3", "main.py"]
-# CMD ["python3", "benchmarks/pad/pad.py"]
-CMD ["python3", "benchmarks/ndb/ndb.py"]
+RUN chmod +x training_scripts/run_pad.sh
+CMD ["bash", "training_scripts/run_pad.sh"]
