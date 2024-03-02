@@ -202,3 +202,22 @@ def compute_f1_score(gt, pred):
 
     # print(confusion_matrix(gt_class, pred_class))
     return F1
+
+def compute_precision_score(gt, pred):
+    gt_class = gt.cpu().detach().numpy()
+    pred_np = pred.cpu().detach().numpy()
+    
+    pred_class = np.argmax(pred_np, axis=1)
+    
+    return precision_score(gt_class, pred_class, average='macro')
+
+def compute_recall_score(gt, pred):
+    gt_class = gt.cpu().detach().numpy()
+    pred_np = pred.cpu().detach().numpy()
+    
+    gt_class = gt.cpu().detach().numpy()
+    pred_np = pred.cpu().detach().numpy()
+    
+    pred_class = np.argmax(pred_np, axis=1)
+    
+    return recall_score(gt_class, pred_class, average='macro')

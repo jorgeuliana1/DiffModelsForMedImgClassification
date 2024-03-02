@@ -427,6 +427,8 @@ class Diffusion(object):
                                 acc_avg += accuracy(label_t_0.detach().cpu(), target.cpu())[0].item()
                         kappa_avg = cohen_kappa(y1_pred.detach().cpu(), y1_true.cpu()).item()
                         f1_avg = compute_f1_score(y1_true,y1_pred).item()
+                        precision_avg = compute_precision_score(y1_true, y1_pred).item()
+                        recall_avg = compute_recall_score(y1_true, y1_pred).item()
                                 
                         acc_avg /= (test_batch_idx + 1)
                         #kappa_avg /= (test_batch_idx + 1)
@@ -450,7 +452,8 @@ class Diffusion(object):
                         logging.info(
                             (
                                     f"epoch: {epoch}, step: {step}, " +
-                                    f"Average accuracy: {acc_avg}, Average Kappa: {kappa_avg}, Average F1: {f1_avg}," +
+                                    f"Average precision: {precision_avg}, Average Recall: {recall_avg}, " +
+                                    f"Average accuracy: {acc_avg}, Average Kappa: {kappa_avg}, Average F1: {f1_avg}, " +
                                     f"Max accuracy: {max_accuracy:.2f}%"
                             )
                         )
