@@ -197,7 +197,7 @@ class PadUfes20Dataset(Dataset):
 class PadUfes20DatasetTrain(PadUfes20Dataset):
     def __init__(self, csv_path, fold_num):
         super(PadUfes20DatasetTrain, self).__init__(csv_path, fold_num)
-        self.df = self.df[self.df["folder"] != self.fold_num]
+        self.df = self.df[self.df["folder"] == self.fold_num]
     
 class PadUfes20DatasetEval(PadUfes20Dataset):
     def __init__(self, csv_path, fold_num):

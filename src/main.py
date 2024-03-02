@@ -139,6 +139,10 @@ parser.add_argument(
     "--num_sample", type=int, default=1, help="number of samples used in forward and reverse"
 )
 
+parser.add_argument(
+    "--fold_n", type=int, default=1, help="Fold to be run"
+)
+
 args = parser.parse_args()
 
 

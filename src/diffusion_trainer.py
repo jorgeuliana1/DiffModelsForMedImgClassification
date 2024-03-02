@@ -136,7 +136,7 @@ class Diffusion(object):
         args = self.args
         config = self.config
         tb_logger = self.config.tb_logger
-        data_object, train_dataset, test_dataset = get_dataset(args, config)
+        data_object, train_dataset, test_dataset = get_dataset(args, config, args.fold_n)
         print('loading dataset..')
 
         train_loader = data.DataLoader(
@@ -484,7 +484,7 @@ class Diffusion(object):
     def test(self):
         args = self.args
         config = self.config
-        data_object, train_dataset, test_dataset = get_dataset(args, config)
+        data_object, train_dataset, test_dataset = get_dataset(args, config, args.fold_n)
         log_path = os.path.join(self.args.log_path)
         train_loader = data.DataLoader(
             train_dataset,

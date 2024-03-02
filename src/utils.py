@@ -94,7 +94,7 @@ def adjust_learning_rate(optimizer, epoch, config):
     return lr
 
 
-def get_dataset(args, config):
+def get_dataset(args, config, fold_n):
     data_object = None
     if config.data.dataset == "PLACENTAL":
         train_dataset = BUDataset(data_list=config.data.traindata, train=True)
@@ -106,8 +106,8 @@ def get_dataset(args, config):
         train_dataset = ISICDataset(data_list=config.data.traindata, train=True)
         test_dataset = ISICDataset(data_list=config.data.testdata, train=False)
     elif config.data.dataset == "PAD-UFES-20":
-        train_dataset = PadUfes20DatasetTrain("/app/datasets/PAD-UFES-20/pad-ufes-20_parsed_folders.csv", 1)
-        test_dataset = PadUfes20DatasetEval("/app/datasets/PAD-UFES-20/pad-ufes-20_parsed_folders.csv", 1)
+        train_dataset = PadUfes20DatasetTrain("/app/datasets/PAD-UFES-20/pad-ufes-20_parsed_folders.csv", fold_n)
+        test_dataset = PadUfes20DatasetEval("/app/datasets/PAD-UFES-20/pad-ufes-20_parsed_folders.csv", fold_n)
     else:
         raise NotImplementedError(
             "Options: toy (classification of two Gaussian), MNIST, FashionMNIST, CIFAR10.")
