@@ -182,9 +182,9 @@ def parse_config():
                 if args.ni:
                     overwrite = True
                 else:
-                    response = input("Folder already exists. Overwrite? (Y/N)")
-                    if response.upper() == "Y":
-                        overwrite = True
+                    #response = input("Folder already exists. Overwrite? (Y/N)")
+                    #if response.upper() == "Y":
+                    overwrite = True
 
                 if overwrite:
                     shutil.rmtree(args.log_path)

@@ -1,6 +1,7 @@
 services:
   med_diff_models:
     build: .
+    runtime: nvidia
     deploy:
       resources:
         reservations:
