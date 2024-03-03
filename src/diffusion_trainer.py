@@ -80,7 +80,7 @@ class Diffusion(object):
 
         # initial prediction model as guided condition
         if config.diffusion.apply_aux_cls:
-            self.cond_pred_model = AuxCls(config).to(self.device)
+            self.cond_pred_model = nn.DataParallel(AuxCls(config)).to(self.model_device)
             self.aux_cost_function = nn.CrossEntropyLoss()
         else:
             pass
