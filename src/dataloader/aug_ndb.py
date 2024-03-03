@@ -7,11 +7,12 @@ Image augmentation classes for PAD-UFES-20 dataset
 """
 
 import numpy as np
+import torch
 import torchvision
 from imgaug import augmenters as iaa
 
 
-class ImgTrainTransformPad:
+class ImgTrainTransformNDB:
 
     def __init__(
         self,
@@ -53,9 +54,11 @@ class ImgTrainTransformPad:
         )
 
     def __call__(self, img):
+        # img = np.array(img)
         img = self.aug.augment_image(np.array(img)).copy()
         transforms = torchvision.transforms.Compose(
             [
+                # self.aug.augment_image,
                 torchvision.transforms.ToTensor(),
                 torchvision.transforms.Normalize(
                     self.normalization[0], self.normalization[1]
@@ -65,7 +68,7 @@ class ImgTrainTransformPad:
         return transforms(img)
 
 
-class ImgEvalTransformPad:
+class ImgEvalTransformNDB:
 
     def __init__(
         self,
@@ -87,3 +90,26 @@ class ImgEvalTransformPad:
             ]
         )
         return transforms(img)
+
+
+class ImgEvalReverseTransformNDB:
+
+    def __init__(
+        self,
+        size=(224, 224),
+        normalization=([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ):
+
+        self.normalization = normalization
+        self.size = size
+
+    def __call__(self, img):
+        # transforms = torchvision.transforms.Compose([
+        #     torchvision.transforms.Normalize(self.normalization[0], self.normalization[1]),
+        # ])
+        # return transforms(img)
+        self.normalization = [torch.tensor(i) for i in self.normalization]
+        return (
+            img * self.normalization[1][:, None, None]
+            + self.normalization[0][:, None, None]
+        )

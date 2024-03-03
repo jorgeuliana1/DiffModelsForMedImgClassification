@@ -21,4 +21,5 @@ COPY ./src /app/src
 ENV MY_MODELS_PATH ${MY_MODELS_PATH}
 
 RUN chmod +x training_scripts/run_pad.sh
-CMD ["bash", "training_scripts/run_pad.sh"]
+# CMD ["bash", "training_scripts/run_pad.sh"]
+CMD ["bash", "training_scripts/run_ndb.sh"]

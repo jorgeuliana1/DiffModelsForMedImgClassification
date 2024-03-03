@@ -108,6 +108,9 @@ def get_dataset(args, config, fold_n):
     elif config.data.dataset == "PAD-UFES-20":
         train_dataset = PadUfes20DatasetTrain("/app/datasets/PAD-UFES-20/pad-ufes-20_parsed_folders.csv", fold_n)
         test_dataset = PadUfes20DatasetEval("/app/datasets/PAD-UFES-20/pad-ufes-20_parsed_folders.csv", fold_n)
+    elif config.data.dataset == "NDB-UFES":
+        train_dataset = NDBUfesDatasetTrain("/app/datasets/NDB-UFES/patch/sabpatch_parsed_folders.csv", fold_n)
+        test_dataset = NDBUfesDatasetEval("/app/datasets/NDB-UFES/patch/sabpatch_parsed_folders.csv", fold_n)
     else:
         raise NotImplementedError(
             "Options: toy (classification of two Gaussian), MNIST, FashionMNIST, CIFAR10.")

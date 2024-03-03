@@ -17,7 +17,8 @@ import json, numbers
 from glob import glob
 import pickle
 import pandas as pd
-from .aug_pad import ImgEvalTransform, ImgTrainTransform
+from .aug_pad import ImgEvalTransformPad, ImgTrainTransformPad
+from .aug_ndb import ImgEvalTransformNDB, ImgTrainTransformNDB
 
 class BUDataset(Dataset):
     def __init__(self, data_list, train=True):
@@ -178,7 +179,7 @@ class PadUfes20Dataset(Dataset):
         self.fold_num = fold_num
         self.y_label = "diagnostic_number"
         self.x_label = "img_id"
-        self.transform = ImgTrainTransform()
+        self.transform = ImgTrainTransformPad()
     
     def __getitem__(self, index):
         img_id = self.df.iloc[index][self.x_label]
@@ -203,4 +204,41 @@ class PadUfes20DatasetEval(PadUfes20Dataset):
     def __init__(self, csv_path, fold_num):
         super(PadUfes20DatasetEval, self).__init__(csv_path, fold_num)
         self.df = self.df[self.df["folder"] != self.fold_num]
-        self.transform = ImgEvalTransform()
+        self.transform = ImgEvalTransformPad()
+        
+class NDBUfesDataset(Dataset):
+    def __init__(self, csv_path, fold_num):
+        self.df = pd.read_csv(csv_path, header=0)
+        
+        self.base_path, _ = os.path.split(csv_path)
+        self.images_path = os.path.join(self.base_path, "images")
+        
+        self.fold_num = fold_num
+        self.y_label = "label_number"
+        self.x_label = "path"
+        self.transform = ImgTrainTransformNDB()
+    
+    def __getitem__(self, index):
+        img_id = self.df.iloc[index][self.x_label]
+        img_path = os.path.join(self.images_path, img_id)
+        label = self.df.iloc[index][self.y_label]
+        
+        # Loading img
+        img = Image.open(img_path).convert('RGB')
+        img_torch = self.transform(img)
+        
+        return img_torch, label
+    
+    def __len__(self):
+        return len(self.df[self.x_label])
+        
+class NDBUfesDatasetTrain(NDBUfesDataset):
+    def __init__(self, csv_path, fold_num):
+        super(NDBUfesDatasetTrain, self).__init__(csv_path, fold_num)
+        self.df = self.df[self.df["folder"] == self.fold_num]
+    
+class NDBUfesDatasetEval(NDBUfesDataset):
+    def __init__(self, csv_path, fold_num):
+        super(NDBUfesDatasetEval, self).__init__(csv_path, fold_num)
+        self.df = self.df[self.df["folder"] != self.fold_num]
+        self.transform = ImgEvalTransformNDB()
