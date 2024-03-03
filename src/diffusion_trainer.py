@@ -27,11 +27,17 @@ class Diffusion(object):
         self.config = config
         if device is None:
             device = (
-                torch.device("cuda")
+                torch.device("cuda:0")
                 if torch.cuda.is_available()
                 else torch.device("cpu")
             )
         self.device = device
+        self.model_device = (
+            torch.device("cuda")
+            if torch.cuda.is_available()
+            else torch.device("cpu")
+        )
+        
 
         self.model_var_type = config.model.var_type
         self.num_timesteps = config.diffusion.timesteps
@@ -154,8 +160,8 @@ class Diffusion(object):
         )
         print('successfully load')
         model = ConditionalModel(config, guidance=config.diffusion.include_guidance)
-        model = model.to(self.device)
         model = nn.DataParallel(model)
+        model = model.to(self.model_device)
         y_acc_aux_model = self.evaluate_guidance_model(test_loader)
         logging.info("\nBefore training, the guidance classifier accuracy on the test set is {:.8f}.\n\n".format(
             y_acc_aux_model))
@@ -517,8 +523,8 @@ class Diffusion(object):
                                 map_location=self.device)
             ckpt_id = self.config.testing.ckpt_id
         logging.info(f"Loading from: {log_path}/ckpt_{ckpt_id}.pth")
-        model = model.to(self.device)
         model = nn.DataParallel(model)
+        model = model.to(self.model_device)
         model.load_state_dict(states[0], strict=True)
 
         num_params = 0
